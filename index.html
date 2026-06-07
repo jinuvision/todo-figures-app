@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>투두 피규어샵 — 할 일 끝내면 픽셀 피규어가 모인다</title>
+<meta name="description" content="할 일을 완료할 때마다 16비트 픽셀 피규어를 수집하는 투두 RPG. 125종 도트 캐릭터, 진열장, 도감. 토스 미니앱(앱인토스)으로 설치 없이 바로 실행." />
+
+<!-- Open Graph / 카카오·X·디스콰이엇 링크 미리보기 -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="투두 피규어샵" />
+<meta property="og:title" content="투두 피규어샵 — 할 일 끝내면 픽셀 피규어가 모인다 🐣" />
+<meta property="og:description" content="할 일 완료 → 경험치 → 레벨업마다 새 픽셀 피규어. 125종 도트 수집 RPG. 토스에서 '투두 피규어샵' 검색." />
+<meta property="og:image" content="https://jinuvision.github.io/todo-figures-app/assets/og.png" />
+<meta property="og:url" content="https://jinuvision.github.io/todo-figures-app/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="투두 피규어샵 — 할 일 끝내면 픽셀 피규어가 모인다 🐣" />
+<meta name="twitter:description" content="할 일 완료 → 경험치 → 레벨업마다 새 픽셀 피규어. 125종 도트 수집 RPG." />
+<meta name="twitter:image" content="https://jinuvision.github.io/todo-figures-app/assets/og.png" />
+
+<link rel="icon" href="./assets/logo.png" />
+<style>
+  :root{
+    --blue:#3B82F6; --blue-d:#2563EB; --ink:#0f172a; --sub:#475569;
+    --bg:#f8fafc; --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",
+      "Malgun Gothic",sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
+
+  /* 자동이동 배너 */
+  #redirectBar{
+    display:none; position:sticky; top:0; z-index:50;
+    background:var(--blue); color:#fff; text-align:center;
+    padding:10px 16px; font-size:14px;
+  }
+  #redirectBar.show{display:block}
+  #redirectBar button{
+    margin-left:10px; background:rgba(255,255,255,.2); border:1px solid #fff;
+    color:#fff; padding:4px 12px; border-radius:999px; font-size:13px; cursor:pointer;
+  }
+
+  /* 히어로 */
+  .hero{text-align:center; padding:56px 20px 40px}
+  .hero .logo{
+    width:96px;height:96px;border-radius:22px;margin:0 auto 20px;
+    box-shadow:0 10px 30px rgba(59,130,246,.25);
+  }
+  .hero h1{font-size:30px;letter-spacing:-.5px;line-height:1.25}
+  .hero .tag{margin-top:14px;font-size:17px;color:var(--sub)}
+  .cta{
+    display:inline-flex;align-items:center;gap:8px;margin-top:28px;
+    background:var(--blue);color:#fff;text-decoration:none;font-weight:700;
+    font-size:17px;padding:15px 30px;border-radius:14px;
+    box-shadow:0 8px 22px rgba(59,130,246,.35);transition:transform .12s,background .12s;
+  }
+  .cta:hover{background:var(--blue-d);transform:translateY(-1px)}
+  .hint{margin-top:12px;font-size:13px;color:#94a3b8}
+
+  /* 섹션 */
+  section{padding:34px 0}
+  h2{font-size:21px;margin-bottom:6px;letter-spacing:-.3px}
+  .lead{color:var(--sub);margin-bottom:18px;font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px;
+  }
+  .card h3{font-size:16px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--sub)}
+  .emoji{font-size:22px}
+
+  /* 스크린샷 */
+  .shots{display:flex;gap:14px;overflow-x:auto;padding:4px 0 8px;scroll-snap-type:x mandatory}
+  .shots img{
+    width:240px;flex:0 0 auto;border-radius:18px;border:1px solid var(--line);
+    scroll-snap-align:center;box-shadow:0 6px 18px rgba(15,23,42,.08);
+  }
+
+  .note{
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;
+    font-size:13.5px;color:var(--sub)
+  }
+  .note b{color:var(--ink)}
+
+  footer{padding:30px 20px 60px;text-align:center;color:#94a3b8;font-size:13px}
+  .footlink{color:var(--blue);text-decoration:none}
+
+  /* 하단 고정 CTA (모바일) */
+  .sticky-cta{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(248,250,252,0),var(--bg) 35%);
+    display:flex;justify-content:center;
+  }
+  .sticky-cta a{
+    width:100%;max-width:420px;text-align:center;background:var(--blue);color:#fff;
+    text-decoration:none;font-weight:700;padding:15px;border-radius:14px;
+    box-shadow:0 8px 22px rgba(59,130,246,.35);
+  }
+  @media(min-width:760px){ .sticky-cta{display:none} }
+  body{padding-bottom:84px}
+  @media(min-width:760px){ body{padding-bottom:0} }
+</style>
+</head>
+<body>
+
+<div id="redirectBar">
+  잠시 후 토스 앱으로 이동합니다 (<span id="cd">3</span>초)
+  <button id="stayBtn" type="button">머무르기</button>
+</div>
+
+<header class="hero">
+  <img class="logo" src="./assets/logo.png" alt="투두 피규어샵 로고" />
+  <h1>할 일 끝내면<br/>픽셀 피규어가 모인다 🐣</h1>
+  <p class="tag">투두 + 도트 수집 RPG · 토스 미니앱</p>
+  <a class="cta" id="openBtn" href="https://minion.toss.im/PjEceJ3w">▶ 토스에서 앱 열기</a>
+  <p class="hint">설치 없이 토스 안에서 바로 실행 · 만 19세 이상 (앱인토스 정책)</p>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h2>어떻게 즐기나요</h2>
+    <p class="lead">작은 완료의 즐거움을 꾸준한 동력으로.</p>
+    <div class="grid">
+      <div class="card"><div class="emoji">✅</div><h3>할 일 → 경험치</h3><p>할 일을 하나 끝낼 때마다 경험치가 쌓이고, 레벨업할 때마다 새 픽셀 캐릭터를 얻어요.</p></div>
+      <div class="card"><div class="emoji">🖼️</div><h3>진열장에 전시</h3><p>16×16 도트로 그려진 캐릭터를 4×5칸 진열장에 골라 배치하고 자랑하세요.</p></div>
+      <div class="card"><div class="emoji">🔥</div><h3>매일 출석 보너스</h3><p>매일 첫 할 일엔 +50 XP, 7일 연속 출석하면 경험치 +10% 보너스.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>125종 수집 시스템</h2>
+    <p class="lead">동물부터 히든 진화까지, 도감을 채우는 재미.</p>
+    <div class="grid">
+      <div class="card"><div class="emoji">🐾</div><h3>일반 105종</h3><p>동물·곤충·휴머노이드·괴물·성직자·엘프·데몬 7개 카테고리.</p></div>
+      <div class="card"><div class="emoji">❄️</div><h3>히든 진화 20종</h3><p>예티 10단계 + 슬러지 10단계, 미션을 달성해야 해금되는 비밀 라인.</p></div>
+      <div class="card"><div class="emoji">📖</div><h3>도감 &amp; 뱃지</h3><p>카테고리별 수집 진행도와 컴플리션 뱃지를 확인하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>스크린샷</h2>
+    <p class="lead">옆으로 넘겨보세요 →</p>
+    <div class="shots">
+      <img src="./assets/shot-endgame-home.png" alt="화려한 진열장 (엔드게임)" loading="lazy" />
+      <img src="./assets/shot-gallery.png" alt="도감 수집 화면" loading="lazy" />
+      <img src="./assets/shot-home.png" alt="투두 입력 홈 화면" loading="lazy" />
+    </div>
+  </section>
+
+  <section>
+    <h2 style="text-align:center">지금 토스에서 시작하기</h2>
+    <p class="lead" style="text-align:center">토스 검색창에 <b>"투두 피규어샵"</b> 또는 아래 버튼</p>
+    <div style="text-align:center">
+      <a class="cta" href="https://minion.toss.im/PjEceJ3w">▶ 토스에서 앱 열기</a>
+    </div>
+  </section>
+
+  <section>
+    <p class="note">
+      <b>광고 정책</b> · 보상형 광고는 하루 무료 3개 이후 선택 시청, 배너 1개 상시, 강제 전면 광고 없음.<br/>
+      <b>개인정보</b> · 별도 회원가입 없이 동작하며 직접 식별 정보를 수집하지 않습니다.
+      <a class="footlink" href="https://jinuvision.github.io/todo-figures-privacy/">개인정보처리방침</a>
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  운영: 지누비전 (사업자등록 203-43-83311)<br/>
+  © 2026 투두 피규어샵 · 토스 미니앱(앱인토스)
+</footer>
+
+<div class="sticky-cta">
+  <a href="https://minion.toss.im/PjEceJ3w">▶ 토스에서 앱 열기</a>
+</div>
+
+<script>
+  (function () {
+    var APP_URL = "https://minion.toss.im/PjEceJ3w";
+    var SECONDS = 3;
+    var KEY = "tf_redirected";
+
+    // 한 세션에서 이미 자동이동했다면(=뒤로가기로 돌아온 경우) 소개페이지만 보여준다.
+    var already = false;
+    try { already = sessionStorage.getItem(KEY) === "1"; } catch (e) {}
+    if (already) return;
+
+    var bar = document.getElementById("redirectBar");
+    var cd = document.getElementById("cd");
+    var stay = document.getElementById("stayBtn");
+    var left = SECONDS;
+    bar.classList.add("show");
+
+    var timer = setInterval(function () {
+      left -= 1;
+      if (cd) cd.textContent = left;
+      if (left <= 0) {
+        clearInterval(timer);
+        try { sessionStorage.setItem(KEY, "1"); } catch (e) {}
+        window.location.href = APP_URL;
+      }
+    }, 1000);
+
+    function cancel() {
+      clearInterval(timer);
+      try { sessionStorage.setItem(KEY, "1"); } catch (e) {}
+      bar.classList.remove("show");
+    }
+    stay.addEventListener("click", cancel);
+    // 사용자가 직접 버튼을 누르면 자동이동 타이머는 의미 없으니 정리
+    document.getElementById("openBtn").addEventListener("click", function(){ clearInterval(timer); });
+  })();
+</script>
+</body>
+</html>
