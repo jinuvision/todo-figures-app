@@ -42,11 +42,22 @@
     background:var(--blue); color:#fff; text-align:center;
     padding:10px 16px; font-size:14px;
   }
-  #redirectBar.show{display:block}
+  #redirectBar.show{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
   #redirectBar button{
-    margin-left:10px; background:rgba(255,255,255,.2); border:1px solid #fff;
-    color:#fff; padding:4px 12px; border-radius:999px; font-size:13px; cursor:pointer;
+    background:#fff; border:0; color:var(--blue); font-weight:800;
+    padding:8px 18px; border-radius:999px; font-size:15px; cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
   }
+
+  /* PC 안내 패널 (QR) */
+  .pcpanel{
+    display:none; margin:26px auto 0; max-width:320px;
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:20px; box-shadow:0 6px 18px rgba(15,23,42,.06);
+  }
+  .pcpanel .pt{font-size:15px;font-weight:700;margin-bottom:12px}
+  .pcpanel .qr{width:180px;height:180px;margin:0 auto;border-radius:10px}
+  .pcpanel .ps{font-size:13px;color:var(--sub);margin-top:12px;line-height:1.5}
 
   /* 히어로 */
   .hero{text-align:center; padding:56px 20px 40px}
@@ -113,8 +124,8 @@
 <body>
 
 <div id="redirectBar">
-  잠시 후 토스 앱으로 이동합니다 (<span id="cd">3</span>초)
-  <button id="stayBtn" type="button">머무르기</button>
+  <span>잠시 후 토스 앱으로 이동합니다 · <b><span id="cd">5</span>초</b></span>
+  <button id="stayBtn" type="button">여기 머무르기</button>
 </div>
 
 <header class="hero">
@@ -123,6 +134,12 @@
   <p class="tag">투두 + 도트 수집 RPG · 토스 미니앱</p>
   <a class="cta" id="openBtn" href="https://minion.toss.im/PjEceJ3w">▶ 토스에서 앱 열기</a>
   <p class="hint">설치 없이 토스 안에서 바로 실행 · 만 19세 이상 (앱인토스 정책)</p>
+
+  <div id="pcPanel" class="pcpanel">
+    <p class="pt">💻 PC에서 보고 계신가요?</p>
+    <img class="qr" src="./assets/qr.png" alt="토스 앱으로 이동하는 QR코드" />
+    <p class="ps">휴대폰 카메라로 QR을 스캔하면<br/>토스에서 바로 열려요 (토스 앱은 모바일 전용)</p>
+  </div>
 </header>
 
 <main class="wrap">
@@ -187,10 +204,21 @@
 <script>
   (function () {
     var APP_URL = "https://minion.toss.im/PjEceJ3w";
-    var SECONDS = 3;
+    var SECONDS = 5;
     var KEY = "tf_redirected";
 
-    // 한 세션에서 이미 자동이동했다면(=뒤로가기로 돌아온 경우) 소개페이지만 보여준다.
+    // 모바일 여부 판별. 토스 앱은 모바일 전용이라 PC에선 자동이동하지 않는다.
+    var ua = navigator.userAgent || "";
+    var isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile|Toss/i.test(ua);
+
+    if (!isMobile) {
+      // PC: 자동이동 끄고 소개 + QR(폰으로 스캔) 안내만 노출.
+      var pc = document.getElementById("pcPanel");
+      if (pc) pc.style.display = "block";
+      return;
+    }
+
+    // 모바일에서 한 세션에 이미 자동이동했다면(=뒤로가기로 돌아온 경우) 소개페이지만 보여준다.
     var already = false;
     try { already = sessionStorage.getItem(KEY) === "1"; } catch (e) {}
     if (already) return;
